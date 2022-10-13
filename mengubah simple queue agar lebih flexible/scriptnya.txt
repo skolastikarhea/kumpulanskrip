@@ -1,0 +1,33 @@
+=================SCRIPT ON LOGIN PROFILE HOTSPOT ========
+#ambil data profile user
+:local dataprofile [/ip hotspot user get [find where name="$user"] profile];
+
+#ambil data rate limit
+:local ratenya [/ip hotspot user profile get [find where name="$dataprofile"] rate-limit];
+
+#ambil data parent
+:local parentnya [/ip hotspot user profile get [find where name="$dataprofile"] parent-queue];
+
+#ambil mac user
+:local macnya $"mac-address";
+
+#hapus queue yang sudah ada
+/queue simple remove [find where name~"<hotspot-$user"];
+
+#bikin queue baru dengan data diatas
+
+/queue simple add name="$user-($macnya)-hotspot" limit-at="$ratenya" max-limit="$ratenya" parent="$parentnya" target="$address";
+
+
+
+==========SCRIPT ON LOGOUT PROFILE HOTSPOT ===========
+#ambil mac user
+:local macnya $"mac-address";
+
+#hapus queue
+/queue simple remove [find where name="$user-($macnya)-hotspot"];
+
+
+==========SCRIPT SCHEDULER UNTUK MENGHAPUS QUEUE YANG NYANGKUT KETIKA MIKROTIK DI RESTART/REBOOT - UBAH BAGIAN NAMA PARENT ========
+
+/queue simple remove [find where parent="NAMA PARENT NYA" name~"-hotspot"];
