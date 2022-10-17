@@ -1,0 +1,23 @@
+#isikan user hotspot yang akan di eksekusi dengan format seperti dibawah ini, detailnya silahkan tonton video saya RHEA VLOG live stream pada tgl 17 okt 2022 : https://youtu.be/RpzAdUjePmw
+:local targetusers {"clientbulanan";"user001";"user002"};
+
+#isikan tanggal eksekusi, jika tanggal hanya 1 angka maka tambah angka 0 di depannya, contoh : 01 , 02 , 03 dst
+:local tglexe 17;
+
+#dibawah ini tidak perlu diganti
+
+:local date [/system clock get date];
+:local tgl [:pick $date 4 6];
+
+:if ($tgl = $tglexe) do={
+:for i from=0 to=([:len $targetusers]-1) do={
+
+:local namauser ($targetusers->$i);
+
+/ip hotspot user disable [find where name="$namauser"];
+/ip hotspot active remove [find where user="$namauser"];
+
+}
+
+
+}
