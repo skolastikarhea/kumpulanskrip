@@ -1,2 +1,2 @@
 # kumpulanskrip
-ini adalah kumpulan skrit mikrotik saya
+ini adalah kumpulan skrip mikrotik saya
