@@ -1,0 +1,58 @@
+=================SCRIPT ON LOGIN PROFILE HOTSPOT ========
+
+#ambil data profile user
+:local dataprofile [/ip hotspot user get [find where name="$user"] profile];
+
+#ambil data rate limit
+:local ratenya [/ip hotspot user profile get [find where name="$dataprofile"] rate-limit];
+
+#ambil data parent
+:local parentnya [/ip hotspot user profile get [find where name="$dataprofile"] parent-queue];
+
+#ambil mac user
+:local macnya $"mac-address";
+
+#hapus queue yang sudah ada
+/queue simple remove [find where name~"<hotspot-$user"];
+
+#bikin queue baru dengan data diatas
+
+:if ([:len $ratenya] < 12) do={/queue simple add name="$user-($macnya)-hotspot" limit-at="$ratenya" max-limit="$ratenya" parent="$parentnya" target="$address";} else={
+		:local ratel2;
+		:local rtrate;
+		:local rtburst;
+		:local rtbt;
+		:local rtbtime;
+		:local prio;
+		:local rtmin;
+
+		:for i from=0 to=([:len $ratenya] - 1) do={ 
+  		:local char [:pick $ratenya $i]
+  		:if ($char = " ") do={
+    		:set $char ","
+  		}
+  
+	:set ratel2 ($ratel2 . $char);
+	}
+	:local ratel3 [:toarray $ratel2];
+	:set rtrate ($ratel3->0);
+	:set rtburst ($ratel3->1);
+	:set rtbt ($ratel3->2);
+	:set rtbtime ($ratel3->3);
+	:set prio ($ratel3->4);
+	:set rtmin ($ratel3->5);
+	/queue simple add name="$user-($macnya)-hotspot" limit-at="$rtmin" max-limit="$rtrate" burst-limit="$rtburst" burst-time="$rtbtime" priority="$prio" burst-threshold="$rtbt" parent="$parentnya" target="$address";
+}
+
+
+==========SCRIPT ON LOGOUT PROFILE HOTSPOT ===========
+#ambil mac user
+:local macnya $"mac-address";
+
+#hapus queue
+/queue simple remove [find where name="$user-($macnya)-hotspot"];
+
+
+==========SCRIPT SCHEDULER UNTUK MENGHAPUS QUEUE YANG NYANGKUT KETIKA MIKROTIK DI RESTART/REBOOT - UBAH BAGIAN NAMA PARENT ========
+
+/queue simple remove [find where parent="NAMA PARENT NYA" name~"-hotspot"];
