@@ -1,0 +1,62 @@
+:local daftarprofile ({});
+:local jamexe ({"00";"02";"03";"22";"23"});
+:local namasch "NAMA SCHEDULERNYA";
+
+####script dibawah ini tidak perlu diubah####
+
+:local sch [/system scheduler get [find where name="$namasch"] start-time];
+
+:local jam [:pick $sch 0 2];
+
+:if ([:len $daftarprofile] = 0) do={
+
+/ip hotspot active remove [find];
+
+:for i from=0 to=([:len $jamexe]-1) do={
+
+:if ($jam = ($jamexe->([:len $jamexe]-1))) do={
+:local jamplus ($jamexe->0);
+/system scheduler set [find where name="$namasch"] start-time="$jamplus:00:00";
+:error "bye";
+}
+
+:if ($jam = ($jamexe->$i)) do={
+:local jamplus ($jamexe->($i+1));
+/system scheduler set [find where name="$namasch"] start-time="$jamplus:00:00";
+:error "bye";
+}
+
+}
+
+} else={
+
+:foreach nmpro in=$daftarprofile do={
+:local datauser ([/ip hotspot user print as-value where profile="$nmpro"]);
+
+:foreach nama in=$datauser do={
+:local namanya ($nama->"name");
+/ip hotspot active remove [find where user="$namanya"];
+}
+
+}
+
+
+:for i from=0 to=([:len $jamexe]-1) do={
+
+:if ($jam = ($jamexe->([:len $jamexe]-1))) do={
+:local jamplus ($jamexe->0);
+/system scheduler set [find where name="$namasch"] start-time="$jamplus:00:00";
+:error "bye";
+}
+
+:if ($jam = ($jamexe->$i)) do={
+:local jamplus ($jamexe->($i+1));
+/system scheduler set [find where name="$namasch"] start-time="$jamplus:00:00";
+:error "bye";
+}
+
+}
+
+}
+
+
